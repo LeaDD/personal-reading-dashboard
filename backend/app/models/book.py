@@ -18,6 +18,8 @@ class Book(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=True)
     finish_date: Mapped[date] = mapped_column(Date, nullable=True)
+
+    # Metadata
     created_at: Mapped[datetime] = mapped_column(Date, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(Date, default=datetime.now, onupdate=datetime.now)
 
