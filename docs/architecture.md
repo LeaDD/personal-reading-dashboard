@@ -6,7 +6,7 @@ A FastAPI-based personal reading analytics system that pulls data from Goodreads
 ## Architecture Decisions
 
 ### Data Strategy
-**Decision:** Store Goodreads data locally in our database
+**Decision:** Store Open Library data locally in our database. API docs @ https://openlibrary.org/developers/api
 **Rationale:** 
 - Eliminates API roundtrips for better performance
 - Provides reliability (local data availability)
