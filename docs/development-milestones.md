@@ -42,24 +42,68 @@ This document tracks the development process, the order in which features were i
 - Uvicorn module path must use dots: `backend.app.main:app` not `backend/app/main:app`
 - SQLite needs `check_same_thread: False` when used with FastAPI (multi-threading concern)
 
-## Milestone 3: Database Setup (In Progress)
+## Milestone 3: Database Setup (Partially Complete)
 
-**What we're doing:**
-- Create `database.py` for SQLAlchemy connection management
-- Create Book model (`models/book.py`) matching architecture schema
-- Initialize database and create tables
-- Test database connectivity
+**What we completed:**
+- ✅ Created `database.py` for SQLAlchemy connection management
+  - Environment variable support for database URL with SQLite default
+  - Conditional SQLite parameters (`check_same_thread=False` only for SQLite)
+  - Engine, SessionLocal factory, Base class configured
+- ✅ Created Book model (`models/book.py`)
+  - Used modern SQLAlchemy 2.0 syntax (`Mapped`, `mapped_column`)
+  - **Final Architecture:** Goodreads CSV + Google Books API
+  - Fields: goodreads_id, status, date_read, date_added (from CSV) + title, author, isbn_13, genre, pages, year_published (from Google Books API)
+  - Proper nullable constraints, string lengths, datetime defaults
+
+**Key decisions made:**
+- **Keep author as string field** (not separate Authors table)
+  - Rationale: No author-specific endpoints planned, simple filtering is sufficient
+  - YAGNI principle: Can add relationship later if needed
+- **Conditional database parameters** using `**kwargs` unpacking pattern
+  - SQLite-specific settings only applied when needed
+  - Makes code portable between SQLite (dev) and PostgreSQL (prod)
+- **Finalized on Goodreads CSV + Google Books API**
+  - Open Library rejected (inconsistent data, missing genre)
+  - Google Books API tested and working well
+  - Clear separation: CSV for reading data, Google Books for book metadata
 
 **Why this order:**
 - **Database connection before models:** Models need to inherit from `Base` (from database.py). Dependency order matters.
 - **Models before endpoints:** Endpoints need models to query. Can't build `/books` endpoint without a Book model.
-- **Test database before building queries:** Verify connection works before writing complex queries.
+- **Goodreads API validation before finalizing:** Validate model matches actual API response structure
 
-**Next steps after database:**
-- Wire database into FastAPI (dependency injection)
-- Build first endpoint (`GET /books`)
-- Add sample data for testing
-- Build filtering logic
+**What's left:**
+- ⏳ Validate model against Goodreads API documentation
+- ⏳ Initialize database and create tables
+- ⏳ Test database connectivity
+- ⏳ Wire database into FastAPI (dependency injection)
+
+**Next steps (in order - Phase 1A, B, C):**
+
+**Phase 1A: Build Independent Components**
+1. ✅ Google Books API client - Tested, working
+2. ⏳ CSV Parser - Parse Goodreads CSV, extract title/author/status/dates
+3. ⏳ Create Database Tables - Simple script to initialize schema
+
+**Phase 1B: Wire Components Together**
+4. ⏳ Deduplication Service - Filter out books already in DB
+5. ⏳ FastAPI Database Dependency - Wire DB session into FastAPI
+6. ⏳ FastAPI Ingestion Endpoint - POST endpoint to receive and write data
+
+**Phase 1C: Orchestration**
+7. ⏳ Main Processing Script - Orchestrate full pipeline
+8. ⏳ Test End-to-End - Process your Goodreads CSV
+
+**Phase 2: AWS/Airflow Integration (Future)**
+- S3 bucket setup
+- Airflow DAG with S3 sensor
+- Replace local file handling with S3 operations
+
+**Key learning:**
+- Validate external APIs before building (Open Library had too many issues)
+- Pivot when external dependencies don't work (Goodreads deprecated, Open Library inconsistent)
+- Test components independently before wiring together (reduces debugging complexity)
+- Logical construction order: Independent → Database → API → Orchestration
 
 ## Development Patterns & Principles
 
