@@ -45,7 +45,9 @@ def get_google_books_data(title: str, author: str) -> dict | None:
                 "genre": volume_info.get("categories")[0] if volume_info.get("categories") else None,
                 "description": volume_info.get("description"),
                 "isbn_10": isbn_10 if isbn_10 else None,
-                "isbn_13": isbn_13 if isbn_13 else None
+                "isbn_13": isbn_13 if isbn_13 else None,
+                "small_thumbnail": volume_info.get("imageLinks", {}).get("smallThumbnail"),
+                "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail")
             }
             return book
         else: 
