@@ -213,3 +213,5 @@ memory-bank/
 docs/development-milestones.md
 
 test_google_books.py
+
+test_data/

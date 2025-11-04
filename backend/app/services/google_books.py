@@ -1,7 +1,8 @@
 import httpx
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)   # Creates logger named "backend.app.services.google_books"
+
 
 def get_google_books_data(title: str, author: str) -> dict | None:
     logger.info(f"Getting Google Books data for {title} by {author}")

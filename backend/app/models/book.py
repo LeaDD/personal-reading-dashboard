@@ -26,7 +26,6 @@ class Book(Base):
     # Goodreads CSV data
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     goodreads_id: Mapped[str] = mapped_column(String(50), unique=True)
-    start_date: Mapped[date] = mapped_column(Date, nullable=True)
     finish_date: Mapped[date] = mapped_column(Date, nullable=True)
 
     # Metadata
