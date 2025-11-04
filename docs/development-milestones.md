@@ -52,8 +52,9 @@ This document tracks the development process, the order in which features were i
 - ✅ Created Book model (`models/book.py`)
   - Used modern SQLAlchemy 2.0 syntax (`Mapped`, `mapped_column`)
   - **Final Architecture:** Goodreads CSV + Google Books API
-  - Fields: goodreads_id, status, date_read, date_added (from CSV) + title, author, isbn_13, genre, pages, year_published (from Google Books API)
-  - Proper nullable constraints, string lengths, datetime defaults
+  - Fields: google_books_id, google_books_link, title, authors (JSON), ISBNs, thumbnails, categories (JSON), goodreads_id, status, dates
+  - Proper nullable constraints, string lengths, DateTime fields
+  - JSON type for lists (SQLite/PostgreSQL compatibility)
 
 **Key decisions made:**
 - **Keep author as string field** (not separate Authors table)
@@ -73,16 +74,28 @@ This document tracks the development process, the order in which features were i
 - **Goodreads API validation before finalizing:** Validate model matches actual API response structure
 
 **What's left:**
-- ⏳ Validate model against Goodreads API documentation
+- ⏳ CSV Parser service to extract Goodreads data
 - ⏳ Initialize database and create tables
 - ⏳ Test database connectivity
 - ⏳ Wire database into FastAPI (dependency injection)
 
+**Additional work completed (Nov 2, 2025):**
+- ✅ Google Books service with proper logging, error handling, type hints
+- ✅ Book model finalized with JSON fields for SQLite/PostgreSQL compatibility
+- ✅ Implemented JSON over ARRAY decision for portable database support
+
 **Next steps (in order - Phase 1A, B, C):**
 
 **Phase 1A: Build Independent Components**
-1. ✅ Google Books API client - Tested, working
-2. ⏳ CSV Parser - Parse Goodreads CSV, extract title/author/status/dates
+1. ✅ Google Books API client (`services/google_books.py`) - Complete with logging, error handling
+2. 🔄 CSV Parser (`services/csv_parser.py`) - **IN PROGRESS**
+   - ✅ Core parsing logic implemented
+   - ✅ Column validation
+   - ✅ Row-level validation (skips invalid rows)
+   - ✅ Logging and error handling
+   - ⏳ Date parsing (finish_date still string, needs to be date object)
+   - ⏳ Fix finish_date to use None instead of empty string
+   - ⏳ Clean up redundant error handling
 3. ⏳ Create Database Tables - Simple script to initialize schema
 
 **Phase 1B: Wire Components Together**

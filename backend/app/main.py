@@ -1,4 +1,7 @@
 from fastapi import FastAPI, status
+import logging 
+
+logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
 
 app = FastAPI(
     title="Personal Reading Dashboard API",
