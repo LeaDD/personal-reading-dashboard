@@ -1,8 +1,7 @@
 import httpx
 import logging
 
-logger = logging.getLogger(__name__)   # Creates logger named "backend.app.services.google_books"
-
+logger = logging.getLogger(__name__)
 
 def get_google_books_data(title: str, author: str) -> dict | None:
     logger.info(f"Getting Google Books data for {title} by {author}")
@@ -61,14 +60,17 @@ def get_google_books_data(title: str, author: str) -> dict | None:
         return None
 
 if __name__ == "__main__":
+    from backend.app.config.logging_config import setup_logging
+    setup_logging()
+
     # Test with a known book from user's CSV
-    print("=== TEST 1: Restaurant at End of Universe ===\n")
+    logger.info("=== TEST 1: Restaurant at End of Universe ===\n")
     book1 = get_google_books_data("The Restaurant at the End of the Universe", "Douglas Adams")
-    print(book1)
+    logger.info(book1)
     
     # Test with another book to check for categories
     print("\n\n=== TEST 2: Testing for Categories ===\n")
     book2 = get_google_books_data("Dune", "Frank Herbert")       
-    print(book2)
+    logger.info(book1)
 
 

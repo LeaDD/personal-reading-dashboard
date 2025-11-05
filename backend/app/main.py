@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status
-import logging 
+from backend.app.config.logging_config import setup_logging
 
-logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
+setup_logging()
 
 app = FastAPI(
     title="Personal Reading Dashboard API",
