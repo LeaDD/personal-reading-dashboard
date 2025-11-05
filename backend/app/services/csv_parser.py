@@ -3,10 +3,7 @@ import logging
 import os
 from datetime import datetime
 
-# In csv_parser.py
-logger = logging.getLogger(__name__)  # Creates logger named "backend.app.services.csv_parser"
-
-
+logger = logging.getLogger(__name__)
 
 def parse_goodreads_csv(file_path: str) -> list[dict]:
     """
@@ -88,6 +85,9 @@ def parse_goodreads_csv(file_path: str) -> list[dict]:
 
 
 if __name__ == "__main__":
+    from backend.app.config.logging_config import setup_logging
+    setup_logging()
+
     test_csv_path = "test_data/goodreads_library_export.csv"
     test_books = parse_goodreads_csv(test_csv_path)
     print(test_books)

@@ -209,9 +209,11 @@ __marimo__/
 # AI notes repository
 memory-bank/
 
-# Just my docs
+# My stuff
 docs/development-milestones.md
 
 test_google_books.py
 
 test_data/
+
+logs/
