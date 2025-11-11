@@ -13,7 +13,7 @@ SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./read
 # SQLite requires check_same_thread=False, other databases don't support it
 engine_kwargs = {}
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine_kwargs["check_same_thread"] = False
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 

@@ -4,6 +4,35 @@ import logging
 logger = logging.getLogger(__name__)
 
 def get_google_books_data(title: str, author: str) -> dict | None:
+    """
+    Query Google Books for a specific title/author combination.
+
+    Args:
+        title: Book title used for the Google Books search (required).
+        author: Author name used for the search (required).
+
+    Returns:
+        dict | None: 
+            A dictionary with the most relevant volume data, including keys:
+            - google_books_id: str
+            - google_books_link: str
+            - title: str
+            - authors: list[str] | None
+            - published_date: str | None
+            - page_count: int | None
+            - categories: list[str] | None
+            - genre: str | None
+            - description: str | None
+            - isbn_10: str | None
+            - isbn_13: str | None
+            - small_thumbnail: str | None
+            - thumbnail: str | None
+            Returns None when no items are found.
+
+    Notes:
+        - Logs INFO when the lookup starts, WARNING when no results are found, and ERROR when the API returns a non-200 response.
+        - Any HTTP or parsing exceptions from httpx are propagated to the caller.
+    """
     logger.info(f"Getting Google Books data for {title} by {author}")
 
     base_url = "https://www.googleapis.com/books/v1/volumes"
