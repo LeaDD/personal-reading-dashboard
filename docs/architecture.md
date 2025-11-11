@@ -1,17 +1,17 @@
 # Personal Reading Analytics Dashboard - Architecture
 
 ## Project Overview
-A FastAPI-based personal reading analytics system that pulls data from Goodreads API, processes it for personal insights, and serves it via REST endpoints with a simple frontend dashboard.
+A FastAPI-based personal reading analytics system that ingests Goodreads CSV exports, enriches them with Google Books metadata, and serves insights via REST endpoints with a simple frontend dashboard.
 
 ## Architecture Decisions
 
 ### Data Strategy
-**Decision:** Store Open Library data locally in our database. API docs @ https://openlibrary.org/developers/api
+**Decision:** Ingest Goodreads CSV exports, enrich each title with Google Books metadata, and store the combined result locally.
 **Rationale:** 
-- Eliminates API roundtrips for better performance
-- Provides reliability (local data availability)
-- Enables complex analytics queries
-- Allows integration with Airflow for scheduled data pulls
+- Goodreads API is deprecated; CSV export is the reliable source of reading activity
+- Google Books provides rich metadata (pages, categories, ISBNs, thumbnails) unavailable in the CSV
+- Local storage enables low-latency analytics queries and historical trend analysis
+- Architecture mirrors production workflow (S3 + Airflow later) while keeping Phase 1 local for simplicity
 
 ### Database Design
 
@@ -19,14 +19,22 @@ A FastAPI-based personal reading analytics system that pulls data from Goodreads
 ```sql
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
-    goodreads_id VARCHAR(50) UNIQUE NOT NULL,
+    google_books_id VARCHAR(40) UNIQUE,
+    google_books_link VARCHAR(500),
     title VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
-    genre VARCHAR(100),
-    pages INTEGER,
+    authors JSONB NOT NULL,
+    published_date DATE,
     year_published INTEGER,
-    status VARCHAR(20) DEFAULT 'want-to-read', -- want-to-read, reading, read
-    start_date DATE,
+    page_count INTEGER,
+    categories JSONB,
+    genre VARCHAR(100),
+    description TEXT,
+    isbn_10 VARCHAR(10),
+    isbn_13 VARCHAR(13),
+    small_thumbnail VARCHAR(500),
+    thumbnail VARCHAR(500),
+    status VARCHAR(20) NOT NULL,
+    goodreads_id VARCHAR(50) UNIQUE NOT NULL,
     finish_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -35,9 +43,10 @@ CREATE TABLE books (
 
 **Key Design Decisions:**
 - Use auto-incrementing `id` as primary key for flexibility
-- Store `goodreads_id` as unique field for API integration
-- Use `DATE` type for start/finish dates to enable date calculations
-- Include `status` field to track reading progress
+- Persist both Goodreads and Google Books identifiers for deduplication and API traceability
+- Store authors and categories as JSON to remain portable across SQLite and PostgreSQL
+- Capture optional metadata (genre, description, ISBN, thumbnails) when Google Books returns it
+- Track reading status and finish date from Goodreads CSV export
 
 ### API Design
 
@@ -87,9 +96,10 @@ GET /reading-trends
 ### Data Flow
 
 1. **Data Ingestion**
-   - Airflow scheduled job pulls data from Goodreads API
-   - Data is cleaned and transformed
-   - Data is loaded into local database
+   - User exports Goodreads library to CSV (manual upload cadence)
+   - Pipeline parses CSV, filters out books already stored locally
+   - For new titles, Google Books API is queried for enriched metadata
+   - Combined record (CSV + Google Books) is written to the database
 
 2. **API Layer**
    - FastAPI serves data from local database
@@ -103,30 +113,27 @@ GET /reading-trends
 
 ### Development Approach
 
-#### Phase 1: Foundation
-- Set up basic FastAPI application
-- Create database schema
-- Implement basic CRUD operations
+#### Phase 1: Foundation & Local Pipeline
+- Set up FastAPI application and project structure
+- Implement Google Books service, CSV parser, logging, and database initialization (Phase 1A)
+- Wire components together: deduplication, DB dependency, ingestion endpoint (Phase 1B)
+- Build orchestration script to process CSV end-to-end (Phase 1C)
 
-#### Phase 2: Data Integration
-- Integrate with Goodreads API
-- Build data ingestion pipeline
-- Test with real data
+#### Phase 2: Production Pipeline Enhancements
+- Move CSV uploads to S3 and add Airflow DAG to orchestrate ingestion
+- Introduce retries, monitoring, and alerting for the pipeline
 
-#### Phase 3: Analytics
-- Implement reading statistics calculations
-- Build trend analysis endpoints
-- Add data visualization
+#### Phase 3: Analytics Endpoints
+- Implement reading statistics, trends, and genre breakdown APIs
+- Add aggregation queries leveraging local database
 
-#### Phase 4: Frontend
-- Create dashboard interface
-- Implement charts and graphs
-- Add interactive features
+#### Phase 4: Frontend Dashboard
+- Create dashboard interface with filtering and visualizations
+- Integrate Chart.js components with backend endpoints
 
-#### Phase 5: Production
-- Deploy to AWS
-- Set up monitoring and logging
-- Optimize performance
+#### Phase 5: Deployment & Operations
+- Deploy to AWS (EC2 + RDS)
+- Configure logging, monitoring, and performance tuning
 
 ### Key Learning Goals
 - FastAPI patterns and best practices
@@ -137,8 +144,8 @@ GET /reading-trends
 - AWS deployment and operations
 
 ## Next Steps
-1. Set up development environment
-2. Create basic FastAPI application
-3. Design and implement database schema
-4. Build first API endpoint
-5. Test with sample data
+1. Initialize database schema (`Base.metadata.create_all`) and verify tables
+2. Implement deduplication service to filter existing books before enrichment
+3. Add FastAPI database dependency and ingestion endpoint
+4. Build orchestration script to run CSV → Google Books → DB pipeline locally
+5. Add tests and documentation for the ingestion workflow
