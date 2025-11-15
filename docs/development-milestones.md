@@ -103,10 +103,16 @@ This document tracks the development process, the order in which features were i
    - ✅ Log file: `logs/app.log`
    - ✅ Integrated into main.py
    - ✅ All modules use proper logger pattern
-4. ⏳ Create Database Tables - Simple script to initialize schema
+4. ✅ Create Database Tables (`init_db.py`) - **COMPLETE**
+   - ✅ `init_db()` script creates schema via `Base.metadata.create_all`
+   - ✅ SQLite `check_same_thread` handled via `connect_args`
+   - ✅ `books.db` generated and schema verified
 
 **Phase 1B: Wire Components Together**
-1. ⏳ Deduplication Service - Filter out books already in DB
+1. ✅ Deduplication Service (`services/deduplication.py`) - **COMPLETE**
+   - ✅ Single query (`IN (...)`) to fetch existing Goodreads IDs
+   - ✅ Filters incoming list using set membership
+   - ✅ Read-only for now; returns books missing from DB
 2. ⏳ FastAPI Database Dependency - Wire DB session into FastAPI
 3. ⏳ FastAPI Ingestion Endpoint - POST endpoint to receive and write data
 
