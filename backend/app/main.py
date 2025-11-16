@@ -18,6 +18,6 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
-app.include_router(books.router)
+app.include_router(books_api.router)
 
 # start with uvicorn backend.app.main:app --reload
