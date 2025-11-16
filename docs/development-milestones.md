@@ -116,15 +116,14 @@ This document tracks the development process, the order in which features were i
 2. ✅ FastAPI Database Dependency - Wire DB session into FastAPI
    - ✅ `get_db()` generator function for dependency injection
 3. ✅ FastAPI Ingestion Endpoint (`api/books_api.py` - renamed Nov 15, 2025) - POST endpoint to receive and write data
-   - ✅ Basic implementation with `list[dict[str, Any]]` request body
-   - ✅ Manual date parsing (temporary until Pydantic refactor)
+   - ✅ Basic implementation with `list[dict[str, Any]]` request body (initial)
+   - ✅ Refactored to use Pydantic `BookCreate` schema (Nov 16, 2025)
+   - ✅ Automatic validation and type conversion (dates, etc.)
+   - ✅ Removed manual date parsing (Pydantic handles it)
    - ✅ Tested successfully via Swagger/FastAPI docs
    - ✅ Router wired into main.py
-   - ⏳ **Future:** Refactor to use Pydantic schemas
-     - Create `GoodreadsCSVRow` schema for CSV validation
-     - Create `BookCreate` schema for ingestion endpoint
-     - Replace manual validation in CSV parser with Pydantic
-     - Remove manual date parsing from endpoint (Pydantic handles it)
+   - ✅ Comprehensive docstring and inline comments added
+   - ⏳ **Future:** Refactor CSV parser to use `CSVBook` schema (optional)
 
 **Additional work completed (Nov 15, 2025):**
 - ✅ File naming convention standardized: `{domain}_{type}.py` pattern
@@ -132,6 +131,19 @@ This document tracks the development process, the order in which features were i
   - Rationale: Eliminates confusion between model, API, and schema files
 - ✅ Package structure completed: Added `__init__.py` to `schemas/` and `services/`
 - ✅ Logging configuration: File handler creation made conditional on environment
+
+**Additional work completed (Nov 16, 2025):**
+- ✅ Pydantic schemas implemented (`schemas/books_schema.py`)
+  - `BookCreate` - Validates combined data for ingestion endpoint
+  - `CSVBook` - Validates CSV data (ready for future CSV parser refactor)
+  - Automatic date string → date object conversion
+  - Schema fields match Book model nullability exactly
+- ✅ Ingestion endpoint refactored to use Pydantic
+  - Request body changed from `list[dict[str, Any]]` to `list[BookCreate]`
+  - Removed manual date parsing (Pydantic handles automatically)
+  - Simplified conversion using `Book(**book_create.model_dump())`
+- ✅ Database model updated: `goodreads_id` set to `nullable=False` (required for deduplication)
+- ✅ Database recreated with updated schema
 
 **Phase 1C: Orchestration**
 1. ⏳ Main Processing Script - Orchestrate full pipeline
