@@ -74,6 +74,32 @@ GET /reading-trends
 - `author` - Filter by author name
 - `year_published` - Filter by publication year
 
+### Data Validation & Schemas
+
+**Decision:** Use Pydantic models for data validation and type conversion.
+
+**Schema Structure:**
+- `GoodreadsCSVRow` - Validates raw CSV data from Goodreads export
+  - Handles column validation, type conversion, whitespace stripping
+  - Replaces manual validation logic in CSV parser
+- `BookCreate` - Validates combined data (CSV + Google Books) for ingestion endpoint
+  - Ensures all required fields are present
+  - Automatically converts date strings to date objects
+  - Validates data types before database insertion
+
+**Benefits:**
+- Automatic validation and type conversion
+- Clear error messages for invalid data
+- Reduces manual validation code in services
+- Better IDE support and type safety
+- Automatic API documentation generation
+
+**Rationale:**
+- Pydantic is core to FastAPI ecosystem
+- Eliminates repetitive validation code (strip(), type checks, etc.)
+- Provides consistent validation across CSV parsing and API endpoints
+- Makes codebase more maintainable and less error-prone
+
 ### Technology Stack
 
 #### Backend

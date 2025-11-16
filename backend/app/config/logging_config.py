@@ -23,8 +23,9 @@ def setup_logging():
     )
 
     # Create handlers for logging to file or console
-    file_handler = logging.FileHandler(log_dir/"app.log")
-    file_handler.setFormatter(formatter)
+    if os.getenv("ENVIRONMENT") == "production":
+        file_handler = logging.FileHandler(log_dir/"app.log")
+        file_handler.setFormatter(formatter)
 
     console_handler = logging.StreamHandler() # Logs to console
     console_handler.setFormatter(formatter)

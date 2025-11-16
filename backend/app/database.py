@@ -29,3 +29,6 @@ def get_db() -> Generator[Session, None, None]:
     finally:
         db.close()
 
+# NOTE: This is commented out because it is not used in the codebase, but is a good example of how to use dependency injection in FastAPI
+# # A type alias for dependency injection: Session provided by get_db
+# db_dependency = Annotated[Session, Depends(get_db)]
