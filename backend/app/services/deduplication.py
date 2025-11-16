@@ -1,5 +1,5 @@
 from backend.app.services.csv_parser import parse_goodreads_csv
-from backend.app.models.book import Book
+from backend.app.models.book_model import Book
 from backend.app.database import SessionLocal
 import logging
 

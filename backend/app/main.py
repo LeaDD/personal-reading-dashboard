@@ -1,5 +1,6 @@
 from fastapi import FastAPI, status
 from backend.app.config.logging_config import setup_logging
+from backend.app.api import books_api
 
 setup_logging()
 
@@ -17,3 +18,6 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+app.include_router(books.router)
+
+# start with uvicorn backend.app.main:app --reload

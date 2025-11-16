@@ -113,8 +113,16 @@ This document tracks the development process, the order in which features were i
    - ✅ Single query (`IN (...)`) to fetch existing Goodreads IDs
    - ✅ Filters incoming list using set membership
    - ✅ Read-only for now; returns books missing from DB
-2. ⏳ FastAPI Database Dependency - Wire DB session into FastAPI
-3. ⏳ FastAPI Ingestion Endpoint - POST endpoint to receive and write data
+2. ✅ FastAPI Database Dependency - Wire DB session into FastAPI
+   - ✅ `get_db()` generator function for dependency injection
+3. ✅ FastAPI Ingestion Endpoint - POST endpoint to receive and write data
+   - ✅ Basic implementation with `list[dict[str, Any]]` request body
+   - ✅ Manual date parsing (temporary until Pydantic refactor)
+   - ⏳ **Future:** Refactor to use Pydantic schemas
+     - Create `GoodreadsCSVRow` schema for CSV validation
+     - Create `BookCreate` schema for ingestion endpoint
+     - Replace manual validation in CSV parser with Pydantic
+     - Remove manual date parsing from endpoint (Pydantic handles it)
 
 **Phase 1C: Orchestration**
 1. ⏳ Main Processing Script - Orchestrate full pipeline
