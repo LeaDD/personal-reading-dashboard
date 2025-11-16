@@ -49,7 +49,7 @@ This document tracks the development process, the order in which features were i
   - Environment variable support for database URL with SQLite default
   - Conditional SQLite parameters (`check_same_thread=False` only for SQLite)
   - Engine, SessionLocal factory, Base class configured
-- ✅ Created Book model (`models/book.py`)
+- ✅ Created Book model (`models/book_model.py` - renamed Nov 15, 2025)
   - Used modern SQLAlchemy 2.0 syntax (`Mapped`, `mapped_column`)
   - **Final Architecture:** Goodreads CSV + Google Books API
   - Fields: google_books_id, google_books_link, title, authors (JSON), ISBNs, thumbnails, categories (JSON), goodreads_id, status, dates
@@ -115,14 +115,23 @@ This document tracks the development process, the order in which features were i
    - ✅ Read-only for now; returns books missing from DB
 2. ✅ FastAPI Database Dependency - Wire DB session into FastAPI
    - ✅ `get_db()` generator function for dependency injection
-3. ✅ FastAPI Ingestion Endpoint - POST endpoint to receive and write data
+3. ✅ FastAPI Ingestion Endpoint (`api/books_api.py` - renamed Nov 15, 2025) - POST endpoint to receive and write data
    - ✅ Basic implementation with `list[dict[str, Any]]` request body
    - ✅ Manual date parsing (temporary until Pydantic refactor)
+   - ✅ Tested successfully via Swagger/FastAPI docs
+   - ✅ Router wired into main.py
    - ⏳ **Future:** Refactor to use Pydantic schemas
      - Create `GoodreadsCSVRow` schema for CSV validation
      - Create `BookCreate` schema for ingestion endpoint
      - Replace manual validation in CSV parser with Pydantic
      - Remove manual date parsing from endpoint (Pydantic handles it)
+
+**Additional work completed (Nov 15, 2025):**
+- ✅ File naming convention standardized: `{domain}_{type}.py` pattern
+  - `models/book_model.py`, `api/books_api.py`, `schemas/books_schema.py`
+  - Rationale: Eliminates confusion between model, API, and schema files
+- ✅ Package structure completed: Added `__init__.py` to `schemas/` and `services/`
+- ✅ Logging configuration: File handler creation made conditional on environment
 
 **Phase 1C: Orchestration**
 1. ⏳ Main Processing Script - Orchestrate full pipeline
