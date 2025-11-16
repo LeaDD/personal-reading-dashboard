@@ -25,7 +25,7 @@ def deduplicate_books(books: list[dict]) -> list[dict]:
         incoming_goodreads_ids = [book_id for book in books if (book_id := book.get("goodreads_id"))]
         # Get all existing books with the same Goodreads IDs
         existing_books = db.query(Book.goodreads_id).filter(Book.goodreads_id.in_(incoming_goodreads_ids)).all()
-        # Get all existing Goodreads IDs
+        # Get all existing Goodreads IDs into a set for O(1) lookup (more efficient than a list)
         existing_goodreads_ids = {book.goodreads_id for book in existing_books}
         # Get all new books that are not already in the database
         new_books = [book for book in books if book.get("goodreads_id") not in existing_goodreads_ids]
