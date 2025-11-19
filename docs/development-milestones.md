@@ -96,6 +96,10 @@ This document tracks the development process, the order in which features were i
    - ✅ Empty date handling (None instead of empty string)
    - ✅ Logging and error handling
    - ✅ Test setup with logging configuration
+   - ✅ Refactored to use Pydantic `CSVBook` schema (Nov 18, 2025)
+     - Returns `list[CSVBook]` instead of `list[dict]`
+     - Manual date parsing still required (Pydantic doesn't parse "YYYY/MM/DD" format)
+     - ValidationError handling for invalid rows
 3. ✅ Logging Configuration (`config/logging_config.py`) - **COMPLETE**
    - ✅ Environment-based configuration (DEBUG dev, INFO prod)
    - ✅ Console logging in development
@@ -113,6 +117,9 @@ This document tracks the development process, the order in which features were i
    - ✅ Single query (`IN (...)`) to fetch existing Goodreads IDs
    - ✅ Filters incoming list using set membership
    - ✅ Read-only for now; returns books missing from DB
+   - ✅ Updated to work with `CSVBook` objects (Nov 18, 2025)
+     - Changed from `list[dict]` to `list[CSVBook]`
+     - Uses attribute access instead of dict access
 2. ✅ FastAPI Database Dependency - Wire DB session into FastAPI
    - ✅ `get_db()` generator function for dependency injection
 3. ✅ FastAPI Ingestion Endpoint (`api/books_api.py` - renamed Nov 15, 2025) - POST endpoint to receive and write data
@@ -123,7 +130,7 @@ This document tracks the development process, the order in which features were i
    - ✅ Tested successfully via Swagger/FastAPI docs
    - ✅ Router wired into main.py
    - ✅ Comprehensive docstring and inline comments added
-   - ⏳ **Future:** Refactor CSV parser to use `CSVBook` schema (optional)
+   - ✅ CSV parser refactored to use `CSVBook` schema (Nov 18, 2025)
 
 **Additional work completed (Nov 15, 2025):**
 - ✅ File naming convention standardized: `{domain}_{type}.py` pattern
@@ -144,6 +151,18 @@ This document tracks the development process, the order in which features were i
   - Simplified conversion using `Book(**book_create.model_dump())`
 - ✅ Database model updated: `goodreads_id` set to `nullable=False` (required for deduplication)
 - ✅ Database recreated with updated schema
+
+**Additional work completed (Nov 18, 2025):**
+- ✅ CSV Parser refactored to use Pydantic `CSVBook` schema
+  - Returns `list[CSVBook]` instead of `list[dict]`
+  - Manual date parsing for "YYYY/MM/DD" format (Pydantic doesn't parse this automatically)
+  - ValidationError handling to skip invalid rows gracefully
+  - Maps CSV column names to schema field names
+- ✅ Deduplication service updated to work with `CSVBook` objects
+  - Changed from `list[dict]` to `list[CSVBook]`
+  - Uses attribute access (`book.goodreads_id`) instead of dict access
+- ✅ `CSVBook` schema enhanced with `Literal` type for status validation
+- **Key Learning:** Pydantic most valuable at API boundaries (endpoints) for automatic documentation. For internal services, simpler approaches may be sufficient, but learning value can justify using it.
 
 **Phase 1C: Orchestration**
 1. ⏳ Main Processing Script - Orchestrate full pipeline
