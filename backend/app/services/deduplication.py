@@ -1,34 +1,35 @@
+import logging
+
 from backend.app.services.csv_parser import parse_goodreads_csv
 from backend.app.models.book_model import Book
+from backend.app.schemas.books_schema import CSVBook
 from backend.app.database import SessionLocal
-import logging
+
 
 logger = logging.getLogger(__name__)
 
-def deduplicate_books(books: list[dict]) -> list[dict]:
+def deduplicate_books(books: list[CSVBook]) -> list[CSVBook]:
     """
     Deduplicate books based on Goodreads ID.
 
     Args:
-        books: List of dictionaries, each representing a book.
+        books: List of CSVBook objects, each representing a book.
 
     Returns:
-        List of dictionaries, each representing a book that is not already in the database.
+        List of CSVBook objects, each representing a book that is not already in the database.
     """
     logger.info(f"Deduplicating {len(books)} books")
-
-    new_books = []
 
     # Check if books are already in the database
     with SessionLocal() as db:
         # Get all existing Goodreads IDs
-        incoming_goodreads_ids = [book_id for book in books if (book_id := book.get("goodreads_id"))]
+        incoming_goodreads_ids = [book_id for book in books if (book_id := book.goodreads_id)]
         # Get all existing books with the same Goodreads IDs
         existing_books = db.query(Book.goodreads_id).filter(Book.goodreads_id.in_(incoming_goodreads_ids)).all()
         # Get all existing Goodreads IDs into a set for O(1) lookup (more efficient than a list)
         existing_goodreads_ids = {book.goodreads_id for book in existing_books}
         # Get all new books that are not already in the database
-        new_books = [book for book in books if book.get("goodreads_id") not in existing_goodreads_ids]
+        new_books = [book for book in books if book.goodreads_id not in existing_goodreads_ids]
 
         return new_books
 
