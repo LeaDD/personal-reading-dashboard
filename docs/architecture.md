@@ -115,9 +115,32 @@ GET /reading-trends
 - **HTML/CSS** - Simple dashboard
 
 #### Infrastructure
-- **AWS EC2** - Application hosting
-- **AWS RDS** - Database hosting
+- **AWS EC2** - Application hosting (can combine FastAPI + Airflow on single instance)
+- **AWS RDS** - Database hosting (PostgreSQL)
+- **AWS S3** - CSV file storage
 - **Airflow** - Data pipeline scheduling
+
+#### AWS Cost Estimates (Personal Use, Low Traffic)
+**Option 1: Combined Instance (Recommended)**
+- EC2 t3.small (FastAPI + Airflow): ~$15/month
+- RDS db.t3.micro: ~$15/month
+- S3 (storage + requests): ~$0.50-1/month
+- **Total: ~$30-31/month**
+
+**Option 2: Separate Instances**
+- EC2 t3.micro (FastAPI): ~$7-8/month
+- EC2 t3.micro (Airflow): ~$7-8/month
+- RDS db.t3.micro: ~$15/month
+- S3: ~$0.50-1/month
+- **Total: ~$30-32/month**
+
+**AWS Free Tier (First 12 Months):**
+- EC2 t2.micro: 750 hours/month free
+- RDS db.t2.micro: Free tier eligible
+- S3: 5GB free
+- **After free tier: ~$30-35/month**
+
+**Note:** Costs are for personal use with minimal traffic. Can be reduced further with spot instances or reserved instances, but adds complexity.
 
 ### Data Flow
 
@@ -145,21 +168,22 @@ GET /reading-trends
 - Wire components together: deduplication, DB dependency, ingestion endpoint (Phase 1B)
 - Build orchestration script to process CSV end-to-end (Phase 1C)
 
-#### Phase 2: Production Pipeline Enhancements
-- Move CSV uploads to S3 and add Airflow DAG to orchestrate ingestion
-- Introduce retries, monitoring, and alerting for the pipeline
-
-#### Phase 3: Analytics Endpoints
+#### Phase 2: Analytics Endpoints (Features-First Approach)
 - Implement reading statistics, trends, and genre breakdown APIs
 - Add aggregation queries leveraging local database
+- Build complete feature set locally before cloud migration
+- **Rationale:** Analytics endpoints are database queries that don't depend on cloud infrastructure. Building features first allows full local testing and validation before investing in cloud setup.
+
+#### Phase 3: Cloud Migration & Production Pipeline
+- Move CSV uploads to S3 and add Airflow DAG to orchestrate ingestion
+- Deploy to AWS (EC2 + RDS)
+- Introduce retries, monitoring, and alerting for the pipeline
+- Configure logging, monitoring, and performance tuning
+- **Rationale:** Migrate complete feature set to cloud once all features are working locally. Cloud migration is primarily orchestration/file handling changes, not endpoint changes.
 
 #### Phase 4: Frontend Dashboard
 - Create dashboard interface with filtering and visualizations
 - Integrate Chart.js components with backend endpoints
-
-#### Phase 5: Deployment & Operations
-- Deploy to AWS (EC2 + RDS)
-- Configure logging, monitoring, and performance tuning
 
 ### Key Learning Goals
 - FastAPI patterns and best practices

@@ -47,6 +47,7 @@ def parse_goodreads_csv(file_path: str) -> list[CSVBook]:
                     book_dict = {
                         "title": row.get("Title").strip(),
                         "author": row.get("Author").strip(),
+                        "additional_authors": row.get("Additional Authors").strip() if row.get("Additional Authors") else None,
                         "goodreads_id": row.get("Book Id").strip(),
                         "status": row.get("Exclusive Shelf").strip(),
                         "finish_date": datetime.strptime(finish_date_str, "%Y/%m/%d").date() if finish_date_str else None
