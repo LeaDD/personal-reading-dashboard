@@ -25,6 +25,7 @@ class BookCreate(BaseModel):
 class CSVBook(BaseModel):
     title: str = Field(..., description="The title of the book")
     author: str = Field(..., description="The author of the book")
+    additional_authors: str | None = Field(None, description="Additional authors of the book")
     goodreads_id: str = Field(..., description="The ID of the book in the Goodreads API")
     status: Literal["read", "currently-reading", "to-read"] = Field("to-read", description="The read status of the book e.g. read, reading, want-to-read")
     finish_date: date | None = Field(None, description="The date the book was finished")

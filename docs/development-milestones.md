@@ -165,13 +165,40 @@ This document tracks the development process, the order in which features were i
 - **Key Learning:** Pydantic most valuable at API boundaries (endpoints) for automatic documentation. For internal services, simpler approaches may be sufficient, but learning value can justify using it.
 
 **Phase 1C: Orchestration**
-1. ⏳ Main Processing Script - Orchestrate full pipeline
-2. ⏳ Test End-to-End - Process your Goodreads CSV
+1. ✅ Update CSVBook schema to include `additional_authors` field (completed earlier)
+2. ✅ Update CSV parser to read "Additional Authors" column (completed earlier)
+3. ✅ Create `book_transformer.py` service to merge CSVBook + Google Books data → BookCreate (Nov 20, 2025)
+   - Handles None google_books_data gracefully (creates BookCreate from CSV only)
+   - Proper error handling (ValidationError and Exception)
+   - Uses CSV data for: status, goodreads_id, finish_date
+   - Uses Google Books data for metadata (title, authors, pages, etc.)
+   - Author priority: Google Books authors (if available) → CSV author (fallback)
+4. ⏳ Implement date parsing in `google_books.py` (parse publishedDate string → date object, extract year_published)
+5. ⏳ Main Processing Script - Orchestrate full pipeline
+6. ⏳ Test End-to-End - Process your Goodreads CSV
 
-**Phase 2: AWS/Airflow Integration (Future)**
-- S3 bucket setup
-- Airflow DAG with S3 sensor
-- Replace local file handling with S3 operations
+**Additional work completed (Nov 20, 2025):**
+- ✅ book_transformer.py service complete
+- ✅ google_books.py bug fixes: Fixed `book.title` reference (didn't exist), added fallbacks for title/authors
+- ✅ google_books.py now guarantees title and authors will always have values
+- ✅ book_transformer.py simplified (removed if conditions since google_books.py guarantees those fields)
+- **Key Decision:** Date parsing will be done in google_books.py (separation of concerns - parsing at API boundary)
+- **Key Learning:** When a service guarantees certain fields, dependent services can rely on those guarantees and simplify code
+
+**Phase 2: Analytics Endpoints (Features-First Approach)**
+- ⏳ Implement reading statistics endpoint (`GET /reading-stats`)
+- ⏳ Implement reading trends endpoint (`GET /reading-trends`)
+- ⏳ Implement genre breakdown endpoint (`GET /genre-breakdown`)
+- ⏳ Add aggregation queries leveraging local database
+- **Rationale:** Build complete feature set locally before cloud migration. Analytics endpoints are database queries that don't depend on cloud infrastructure.
+
+**Phase 3: Cloud Migration & Production Pipeline (Future)**
+- ⏳ S3 bucket setup
+- ⏳ Airflow DAG with S3 sensor
+- ⏳ Replace local file handling with S3 operations
+- ⏳ Deploy to AWS (EC2 + RDS)
+- ⏳ Configure logging, monitoring, and performance tuning
+- **AWS Cost Estimate:** ~$30-35/month for personal use (see architecture.md for details)
 
 **Key learning:**
 - Validate external APIs before building (Open Library had too many issues)
