@@ -173,7 +173,12 @@ This document tracks the development process, the order in which features were i
    - Uses CSV data for: status, goodreads_id, finish_date
    - Uses Google Books data for metadata (title, authors, pages, etc.)
    - Author priority: Google Books authors (if available) → CSV author (fallback)
-4. ⏳ Implement date parsing in `google_books.py` (parse publishedDate string → date object, extract year_published)
+4. ✅ Implement date parsing in `google_books.py` (Nov 22, 2025)
+   - Parse publishedDate string → date object
+   - Handle formats: "2006" (year only), "2006-01" (year-month), "2006-01-15" (full date)
+   - Extract year_published from parsed date
+   - Handle None case and unexpected formats
+   - Updated docstring to reflect date | None return type
 5. ⏳ Main Processing Script - Orchestrate full pipeline
 6. ⏳ Test End-to-End - Process your Goodreads CSV
 
@@ -184,6 +189,15 @@ This document tracks the development process, the order in which features were i
 - ✅ book_transformer.py simplified (removed if conditions since google_books.py guarantees those fields)
 - **Key Decision:** Date parsing will be done in google_books.py (separation of concerns - parsing at API boundary)
 - **Key Learning:** When a service guarantees certain fields, dependent services can rely on those guarantees and simplify code
+
+**Additional work completed (Nov 22, 2025):**
+- ✅ Date parsing implemented in google_books.py
+  - Handles three date formats: year-only (4 chars), year-month (7 chars), full date (10 chars)
+  - Returns `date` objects instead of strings
+  - Extracts `year_published` from parsed date
+  - Handles None case and unexpected formats (defensive programming)
+  - Updated docstring to reflect actual return types
+- **Key Learning:** Defensive programming matters - else clauses for unexpected formats prevent runtime errors
 
 **Phase 2: Analytics Endpoints (Features-First Approach)**
 - ⏳ Implement reading statistics endpoint (`GET /reading-stats`)
