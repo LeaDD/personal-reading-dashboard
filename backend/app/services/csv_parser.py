@@ -42,12 +42,37 @@ def parse_goodreads_csv(file_path: str) -> list[CSVBook]:
             # Parse the data into CSVBook objects
             for row in reader:
                 # Map the CSV column names to the CSVBook object fields
+
                 try:
                     finish_date_str = row.get("Date Read").strip() or None
+
+                    # Parse the ISBN-10 value
+                    isbn_value = row.get("ISBN", "").strip()
+                    if isbn_value:
+                        isbn_value = isbn_value.replace('="', '').rstrip('"')
+                        isbn_10 = isbn_value
+                    else:
+                        isbn_10 = None
+
+                    # Parse the ISBN-13 value
+                    isbn_13_value = row.get("ISBN13", "").strip()
+                    if isbn_13_value:
+                        isbn_13_value = isbn_13_value.replace('="', '').rstrip('"')
+                        isbn_13 = isbn_13_value
+                    else:
+                        isbn_13 = None
+
+                    # Parse the number of pages
+                    num_pages_str = row.get("Number of Pages", "").strip()
+                    num_pages = int(num_pages_str) if num_pages_str and num_pages_str.isdigit() else None
+
                     book_dict = {
                         "title": row.get("Title").strip(),
                         "author": row.get("Author").strip(),
+                        "isbn_10":  isbn_10,
+                        "isbn_13": isbn_13,
                         "additional_authors": row.get("Additional Authors").strip() if row.get("Additional Authors") else None,
+                        "num_pages": num_pages,
                         "goodreads_id": row.get("Book Id").strip(),
                         "status": row.get("Exclusive Shelf").strip(),
                         "finish_date": datetime.strptime(finish_date_str, "%Y/%m/%d").date() if finish_date_str else None
