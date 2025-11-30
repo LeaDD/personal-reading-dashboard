@@ -1,5 +1,5 @@
-from datetime import date
-from pydantic import BaseModel, Field
+from datetime import date, datetime
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Literal
 
 class BookCreate(BaseModel):
@@ -30,6 +30,12 @@ class CSVBook(BaseModel):
     additional_authors: str | None = Field(None, description="Additional authors of the book")
     num_pages: int | None = Field(None, description="The number of pages in the book")
     goodreads_id: str = Field(..., description="The ID of the book in the Goodreads API")
-    status: Literal["read", "currently-reading", "to-read"] = Field("to-read", description="The read status of the book e.g. read, reading, want-to-read")
+    status: Literal["read", "currently-reading", "to-read"] = Field("to-read", description="The read status of the book e.g. read, currently-reading, want-to-read")
     finish_date: date | None = Field(None, description="The date the book was finished")
 
+class BookResponse(BookCreate):
+    model_config = ConfigDict(from_attributes=True)
+    id: int = Field(..., description="Unique book ID in DB.")
+    created_at: datetime = Field(..., description="DB record creation timestamp.")
+    updated_at: datetime = Field(..., description="DB record updated timestamp.")
+    

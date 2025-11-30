@@ -96,5 +96,5 @@ GET /recommendations - Personalized suggestions
 - **Backend:** FastAPI, SQLAlchemy, PostgreSQL/SQLite
 - **Frontend:** Vanilla JavaScript, Chart.js
 - **Deployment:** AWS (EC2, RDS)
-- **Testing:** pytest
+- **Testing:** unittest
 - **Data:** Goodreads API

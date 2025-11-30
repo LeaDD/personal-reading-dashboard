@@ -107,7 +107,7 @@ GET /reading-trends
 - **SQLAlchemy** - ORM
 - **PostgreSQL** - Production database
 - **SQLite** - Development database
-- **pytest** - Testing framework
+- **unittest** - Testing framework (Python standard library)
 
 #### Frontend
 - **Vanilla JavaScript** - No framework complexity
