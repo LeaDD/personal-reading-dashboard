@@ -179,8 +179,17 @@ This document tracks the development process, the order in which features were i
    - Extract year_published from parsed date
    - Handle None case and unexpected formats
    - Updated docstring to reflect date | None return type
-5. ⏳ Main Processing Script - Orchestrate full pipeline
-6. ⏳ Test End-to-End - Process your Goodreads CSV
+5. ✅ Main Processing Script - Orchestrate full pipeline (Nov 27, 2025)
+   - Created `orchestrate_csv_to_db.py` script
+   - Full pipeline: CSV → parse → dedupe → enrich → transform → ingest
+   - Batch processing (100 books per batch)
+   - Error handling for individual book failures
+   - Comprehensive logging at each stage
+6. ✅ Test End-to-End - Process your Goodreads CSV (Nov 27, 2025)
+   - Successfully processed all 200 books
+   - 100% Google Books match rate
+   - Rate limiting handled with retry logic
+   - All books ingested successfully
 
 **Additional work completed (Nov 20, 2025):**
 - ✅ book_transformer.py service complete
@@ -199,12 +208,44 @@ This document tracks the development process, the order in which features were i
   - Updated docstring to reflect actual return types
 - **Key Learning:** Defensive programming matters - else clauses for unexpected formats prevent runtime errors
 
-**Phase 2: Analytics Endpoints (Features-First Approach)**
+**Additional work completed (Nov 27, 2025):**
+- ✅ Google Books API improvements
+  - ISBN-based search with fallback chain (ISBN-13 → ISBN-10 → title/author)
+  - Retry logic with exponential backoff for rate limit errors (429 status)
+  - 0.5s delay between API calls to prevent cascading rate limits
+  - Enhanced logging to track search method success
+  - Result: 100% match rate on 200 books
+- ✅ Data priority refinements
+  - CSV title now primary (more reliable than Google Books)
+  - CSV page_count now primary (Google Books often returns 0 or None)
+  - Updated `book_transformer.py` accordingly
+- ✅ Orchestration pipeline complete
+  - End-to-end pipeline tested and working
+  - Batch processing (100 books per batch)
+  - Individual book failure handling (logs but continues)
+  - Comprehensive logging at each stage
+- ✅ Documentation updates
+  - Updated README to reflect CSV exports (not API)
+  - Created comprehensive data flow diagram
+  - Updated architecture and milestones
+- ✅ Testing framework decision: Use `unittest` instead of `pytest` (consistency with work)
+- **Phase 1 Status: ✅ COMPLETE**
+
+**Phase 2: Analytics Endpoints (Features-First Approach)** 🎯 **IN PROGRESS**
+- ✅ GET /books endpoint with filtering (Nov 28, 2025)
+  - Query parameters: status, genre, author, year_published
+  - Conditional filter chaining pattern
+  - Database-agnostic JSON array handling (PostgreSQL vs SQLite)
+  - Case-insensitive matching for genre and author
+  - Partial string matching for author search
+  - **Pending:** Response schema, logging, error handling
 - ⏳ Implement reading statistics endpoint (`GET /reading-stats`)
 - ⏳ Implement reading trends endpoint (`GET /reading-trends`)
 - ⏳ Implement genre breakdown endpoint (`GET /genre-breakdown`)
 - ⏳ Add aggregation queries leveraging local database
 - **Rationale:** Build complete feature set locally before cloud migration. Analytics endpoints are database queries that don't depend on cloud infrastructure.
+- **Goal:** Power personal website dashboard with reading insights
+- **Approach:** User writing 65-70% of code, AI assists with 30-35% (complex SQLAlchemy patterns, database-specific logic)
 
 **Phase 3: Cloud Migration & Production Pipeline (Future)**
 - ⏳ S3 bucket setup
