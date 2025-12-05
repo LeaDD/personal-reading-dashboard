@@ -238,14 +238,29 @@ This document tracks the development process, the order in which features were i
   - Database-agnostic JSON array handling (PostgreSQL vs SQLite)
   - Case-insensitive matching for genre and author
   - Partial string matching for author search
-  - **Pending:** Response schema, logging, error handling
-- ⏳ Implement reading statistics endpoint (`GET /reading-stats`)
-- ⏳ Implement reading trends endpoint (`GET /reading-trends`)
-- ⏳ Implement genre breakdown endpoint (`GET /genre-breakdown`)
+- ✅ GET /books endpoint improvements (Dec 1, 2025)
+  - ✅ BookResponse Pydantic schema with `from_attributes=True`
+  - ✅ Comprehensive logging with module-level logger
+  - ✅ Exception handling with reusable handler function
+  - ✅ Proper error messages and HTTP status codes
+- ✅ GET /books/{book_id} endpoint (Dec 1, 2025)
+  - Returns single book by ID
+  - 404 handling for not found
+  - Consistent exception handling
+- ✅ GET /reading-trends endpoint (Dec 3, 2025)
+  - Database-specific date extraction (strftime for SQLite, extract for PostgreSQL)
+  - Groups by year_read, month_read, and genre
+  - Returns time-based reading analysis
+  - Fixed recursion error (expression objects vs row values)
+- ⏳ GET /reading-stats endpoint (Dec 3, 2025 - In Progress)
+  - Query structure implemented (totals and averages)
+  - **Pending:** Complete return structure (dict with totals + genre breakdown list)
+  - **Pending:** Create Pydantic response schemas
+- ⏳ Implement genre breakdown endpoint (`GET /genre-breakdown`) - May be integrated into reading-stats
 - ⏳ Add aggregation queries leveraging local database
 - **Rationale:** Build complete feature set locally before cloud migration. Analytics endpoints are database queries that don't depend on cloud infrastructure.
 - **Goal:** Power personal website dashboard with reading insights
-- **Approach:** User writing 65-70% of code, AI assists with 30-35% (complex SQLAlchemy patterns, database-specific logic)
+- **Approach:** User writing 75-80% of code, AI assists with 20-25% (complex SQLAlchemy patterns, database-specific logic)
 
 **Phase 3: Cloud Migration & Production Pipeline (Future)**
 - ⏳ S3 bucket setup
