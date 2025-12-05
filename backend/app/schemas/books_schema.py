@@ -34,8 +34,27 @@ class CSVBook(BaseModel):
     finish_date: date | None = Field(None, description="The date the book was finished")
 
 class BookResponse(BookCreate):
+    # ConfigDict needed to convert SQLAlchemy instances with attributes to Pydantic schema
     model_config = ConfigDict(from_attributes=True)
     id: int = Field(..., description="Unique book ID in DB.")
     created_at: datetime = Field(..., description="DB record creation timestamp.")
     updated_at: datetime = Field(..., description="DB record updated timestamp.")
     
+class GenreCount(BaseModel):
+    """Nested schema for genre breakdown items - more type-safe than list[dict]"""
+    genre: str = Field(..., description="Genre name")
+    books_count: int = Field(..., description="Number of books in this genre")
+    pages_count: int = Field(..., description="Total pages read in this genre")
+
+class StatsResponse(BaseModel):
+    total_pages_read: int = Field(..., description="Sum of page count in all read books.")
+    total_books_read: int = Field(..., description="Count of all read books.")
+    avg_pages_per_book: float = Field(..., description="Average page count of all read books.")
+    genre_breakdown: list[GenreCount] = Field(..., description="Count of pages and books by genre.")
+
+class TrendsResponse(BaseModel):
+    year_read: str = Field(..., description="Year in which reading was completed.")
+    month_read: str = Field(..., description="Month in which reading was completed.")
+    pages_read: int = Field(..., description="Count of pages read for corresponding period.")
+    books_read: int = Field(..., description="Count of books read for corresponding period.")
+    genre: str = Field(..., description="Genre of books read.")
