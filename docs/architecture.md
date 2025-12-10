@@ -144,11 +144,13 @@ GET /reading-trends
 
 ### Data Flow
 
-1. **Data Ingestion**
+1. **Data Ingestion & Sync**
    - User exports Goodreads library to CSV (manual upload cadence)
    - Pipeline parses CSV, filters out books already stored locally
    - For new titles, Google Books API is queried for enriched metadata
    - Combined record (CSV + Google Books) is written to the database
+   - Update service syncs status changes from subsequent CSV exports
+   - Delete service removes books no longer in CSV (future)
 
 2. **API Layer**
    - FastAPI serves data from local database
