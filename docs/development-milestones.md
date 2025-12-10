@@ -229,9 +229,16 @@ This document tracks the development process, the order in which features were i
   - Created comprehensive data flow diagram
   - Updated architecture and milestones
 - ✅ Testing framework decision: Use `unittest` instead of `pytest` (consistency with work)
-- **Phase 1 Status: ✅ COMPLETE**
+- ✅ Update Books Service (`services/update_books.py`) - Dec 9, 2025
+  - Syncs book status changes from CSV exports to database
+  - Batch query optimization (single query instead of N queries)
+  - Takes session parameter for transaction control
+  - Proper error handling with SQLAlchemyError and Exception
+  - Removed HTTPException from services (proper separation of concerns)
+  - Self-contained: detects and updates in one function
+- **Phase 1 Status: ✅ COMPLETE** (Update service complete, delete service pending)
 
-**Phase 2: Analytics Endpoints (Features-First Approach)** 🎯 **IN PROGRESS**
+**Phase 2: Analytics Endpoints (Features-First Approach)** ✅ **COMPLETE**
 - ✅ GET /books endpoint with filtering (Nov 28, 2025)
   - Query parameters: status, genre, author, year_published
   - Conditional filter chaining pattern
@@ -252,12 +259,12 @@ This document tracks the development process, the order in which features were i
   - Groups by year_read, month_read, and genre
   - Returns time-based reading analysis
   - Fixed recursion error (expression objects vs row values)
-- ⏳ GET /reading-stats endpoint (Dec 3, 2025 - In Progress)
-  - Query structure implemented (totals and averages)
-  - **Pending:** Complete return structure (dict with totals + genre breakdown list)
-  - **Pending:** Create Pydantic response schemas
-- ⏳ Implement genre breakdown endpoint (`GET /genre-breakdown`) - May be integrated into reading-stats
-- ⏳ Add aggregation queries leveraging local database
+- ✅ GET /reading-stats endpoint (Dec 4, 2025)
+  - Complete return structure (dict with totals + genre breakdown list)
+  - Pydantic response schemas created (StatsResponse, GenreCount)
+  - Genre breakdown integrated into stats endpoint (no separate endpoint needed)
+  - Comprehensive None handling for aggregate results
+  - Proper logging and error handling
 - **Rationale:** Build complete feature set locally before cloud migration. Analytics endpoints are database queries that don't depend on cloud infrastructure.
 - **Goal:** Power personal website dashboard with reading insights
 - **Approach:** User writing 75-80% of code, AI assists with 20-25% (complex SQLAlchemy patterns, database-specific logic)

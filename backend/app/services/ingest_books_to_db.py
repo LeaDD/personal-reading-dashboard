@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from backend.app.models.book_model import Book
 from backend.app.schemas.books_schema import BookCreate
@@ -45,7 +44,7 @@ def ingest_books_to_db(books: list[BookCreate], db: Session) -> dict[str, int | 
     except Exception as e:
         db.rollback()
         logger.error(f"Error ingesting books: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise
 
     return {"message": "Books ingested successfully", "count": len(book_instances)}
 

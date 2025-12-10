@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Path
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,6 +7,7 @@ from backend.app.database import get_db, engine
 from backend.app.schemas.books_schema import BookCreate, BookResponse, StatsResponse, TrendsResponse
 from backend.app.services.ingest_books_to_db import ingest_books_to_db
 from backend.app.models.book_model import Book
+from typing import Annotated
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +35,16 @@ async def ingest_books(
 
 @router.get("/", status_code=200)
 async def get_books(
-    status: str | None = Query(None, description="Filter by status"),
-    genre: str | None = Query(None, description="Filter by genre"),
-    author: str | None = Query(None, description="Filter by author"),
-    year_published: int | None = Query(None, description="Filter by publication year"),
+    status: Annotated[str, Query(description="Filter by status")] = None,
+    genre: Annotated[str, Query(description="Filter by genre")] = None,
+    author: Annotated[str, Query(description="Filter by author")] = None,
+    year_published: Annotated[int, Query(description="Filter by publication year")] = None,
     # title: str | None = Query(None, "Filter by book title."),
     db: Session = Depends(get_db)
 ) -> list[BookResponse]:
+    """
+    Retrieve a list of BookResponse objects using one (or more) of the four available query parameters.
+    """
     query = db.query(Book)
 
     if status:
@@ -174,7 +178,7 @@ async def get_reading_trends(
 
 @router.get("/{book_id}", status_code=200)
 async def get_book_by_id(
-    book_id: int,
+    book_id: Annotated[int, Path(description="Unique ID of book to be returned.")],
     db: Session = Depends(get_db) 
 ) -> BookResponse:
 
