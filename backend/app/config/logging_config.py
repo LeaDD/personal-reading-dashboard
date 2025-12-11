@@ -43,6 +43,10 @@ def setup_logging():
     # Set log level FIRST
     root_logger.setLevel(log_level)
 
+    # # Suppress verbose logging from third-party libraries
+    # logging.getLogger("httpx").setLevel(logging.WARNING)
+    # logging.getLogger("httpcore").setLevel(logging.WARNING)
+
     # Then add handlers
     if os.getenv("ENVIRONMENT") == "development":
         root_logger.addHandler(console_handler)
