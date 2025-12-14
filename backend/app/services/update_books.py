@@ -4,11 +4,8 @@ from sqlalchemy.orm import Session
 
 from backend.app.models.book_model import Book
 from backend.app.schemas.books_schema import CSVBook
-from backend.app.database import SessionLocal
-
 
 logger = logging.getLogger(__name__)
-
 
 def update_books(books: list[CSVBook], db: Session) -> dict[str, int]:
     """
@@ -63,19 +60,18 @@ def update_books(books: list[CSVBook], db: Session) -> dict[str, int]:
         raise
 
 if __name__ == "__main__":    
-    # Imports
     from backend.app.services.csv_parser import parse_goodreads_csv
     from backend.app.config.logging_config import setup_logging
+    from backend.app.database import SessionLocal
+
+    # Enable logging
+    setup_logging()
+
+    # Bring in the Goodreads records
+    csv_books = parse_goodreads_csv("test_data/goodreads_library_export.csv")
 
     # Initialize Session factory
-    with SessionLocal() as db:
-
-        # Enable logging
-        setup_logging()
-
-        # Bring in the Goodreads records
-        csv_books = parse_goodreads_csv("test_data/goodreads_library_export.csv")
-
+    with SessionLocal() as db:       
         # Perform the updates
         updated_books = update_books(csv_books, db)
-        print(updated_books)
+        logger.info(updated_books)
