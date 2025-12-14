@@ -4,8 +4,6 @@ from sqlalchemy.orm import Session
 from backend.app.services.csv_parser import parse_goodreads_csv
 from backend.app.models.book_model import Book
 from backend.app.schemas.books_schema import CSVBook
-from backend.app.database import SessionLocal
-
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +30,7 @@ def deduplicate_books(books: list[CSVBook], db: Session) -> list[CSVBook]:
         existing_goodreads_ids = {book.goodreads_id for book in existing_books}
         # Get all new books that are not already in the database
         new_books = [book for book in books if book.goodreads_id not in existing_goodreads_ids]
-            
+
     except Exception as e:
         logger.error(f"Unexpected error while deduplicating books: {e}")
 
@@ -40,11 +38,15 @@ def deduplicate_books(books: list[CSVBook], db: Session) -> list[CSVBook]:
 
 
 if __name__ == "__main__":
+    from backend.app.database import SessionLocal
     from backend.app.config.logging_config import setup_logging
     setup_logging()
 
-    with SessionLocal() as db:        
-        books = parse_goodreads_csv("test_data/goodreads_library_export.csv")
+    # Bring in the Goodreads records
+    books = parse_goodreads_csv("test_data/goodreads_library_export.csv")
+
+    # Initialize Session factory
+    with SessionLocal() as db:                
         deduplicated_books = deduplicate_books(books, db)
         logger.info(f"Deduplicated {len(deduplicated_books)} books")
         logger.info(deduplicated_books)
