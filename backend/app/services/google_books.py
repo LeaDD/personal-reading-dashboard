@@ -43,8 +43,14 @@ def call_google_books_api(query: str, max_retries: int = 3) -> dict | None:
     
     return None
 
-def process_api_response(data: dict) -> dict:
-    """Process API response data into book dictionary."""
+def process_api_response(data: dict, title: str, author: str) -> dict:
+    """Process API response data into book dictionary.
+    
+    Args:
+        data: Google Books API response dictionary
+        title: Original title (used as fallback if API doesn't return title)
+        author: Original author (used as fallback if API doesn't return authors)
+    """
     first_result = data["items"][0]
     volume_info = first_result.get("volumeInfo", {})     
 
@@ -135,7 +141,7 @@ def get_google_books_data(title: str, author: str, isbn_10: str | None = None, i
         if result:
             matched_title = result["items"][0].get("volumeInfo", {}).get("title", "Unknown")
             logger.info(f"✓ Match found via ISBN-13: '{matched_title}'")
-            return process_api_response(result)
+            return process_api_response(result, title, author)
         else:
             logger.info(f"  No results for ISBN-13: {isbn_13}, falling back...")
 
@@ -145,7 +151,7 @@ def get_google_books_data(title: str, author: str, isbn_10: str | None = None, i
         if result:
             matched_title = result["items"][0].get("volumeInfo", {}).get("title", "Unknown")
             logger.info(f"✓ Match found via ISBN-10: '{matched_title}'")
-            return process_api_response(result)
+            return process_api_response(result, title, author)
         else:
             logger.info(f"  No results for ISBN-10: {isbn_10}, falling back...")
 
@@ -156,7 +162,7 @@ def get_google_books_data(title: str, author: str, isbn_10: str | None = None, i
         matched_title = result["items"][0].get("volumeInfo", {}).get("title", "Unknown")
         matched_authors = result["items"][0].get("volumeInfo", {}).get("authors", [])
         logger.info(f"✓ Match found via title/author: '{matched_title}' by {matched_authors}")
-        return process_api_response(result)
+        return process_api_response(result, title, author)
     
     # No results found
     logger.warning(f"✗ No results found for '{title}' by '{author}' (tried ISBN-13: {isbn_13}, ISBN-10: {isbn_10})")
