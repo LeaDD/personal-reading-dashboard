@@ -236,9 +236,42 @@ This document tracks the development process, the order in which features were i
   - Proper error handling with SQLAlchemyError and Exception
   - Removed HTTPException from services (proper separation of concerns)
   - Self-contained: detects and updates in one function
-- **Phase 1 Status: ✅ COMPLETE** (Update service complete, delete service pending)
+- ✅ Delete Books Service (`services/delete_books.py`) - Dec 14, 2025
+  - Deletes books present in DB but not in incoming CSV (delta delete)
+  - Batch query optimization (single query with `not_in()` filter)
+  - Proper error handling and logging
+  - Returns count of deleted books
+- ✅ Orchestration Script Refactored (`scripts/orchestrate_csv_to_db.py`) - Dec 14, 2025
+  - Integrated update and delete services
+  - Moved DB session context to top level (single transaction)
+  - Order: Parse → Update → Delete → Deduplicate → Enrich → Ingest
+  - Added logging setup in `__main__` block
+  - End-to-end testing successful
+- ✅ Google Books Service Bug Fix - Dec 14, 2025
+  - Fixed `process_api_response()` to accept `title` and `author` parameters
+  - Prevents `NameError` when Google Books doesn't return author data
+- **Phase 1 Status: ✅ COMPLETE** (All services complete, orchestration integrated)
 
 **Phase 2: Analytics Endpoints (Features-First Approach)** ✅ **COMPLETE**
+
+**Phase 2.5: CRUD API Endpoints** ✅ **COMPLETE** - Dec 17, 2025
+- ✅ Full CRUD operation coverage
+  - Create: `POST /books/ingest` (batch ingest)
+  - Read: `GET /books`, `GET /books/{book_id}`, `GET /reading-stats`, `GET /reading-trends`
+  - Update: `PUT /books/{book_id}` (single update), `POST /books/batch-update` (orchestration)
+  - Delete: `DELETE /books/{book_id}` (single delete), `POST /books/delta-delete` (orchestration)
+- ✅ Standard REST endpoints for general API use
+- ✅ Workflow-specific endpoints for orchestration pipeline
+- ✅ Comprehensive docstrings on all endpoints
+- ✅ Production-ready exception handling
+  - Preserves HTTPExceptions (404, etc.) unchanged
+  - Logs full details server-side
+  - Returns generic messages to clients
+- ✅ Type validation with `Literal` types
+  - Automatic validation for status values
+  - Auto-documented in Swagger
+  - No manual validation code needed
+- **Rationale:** Provide both standard REST patterns and workflow-specific endpoints. Different use cases, both valid.
 - ✅ GET /books endpoint with filtering (Nov 28, 2025)
   - Query parameters: status, genre, author, year_published
   - Conditional filter chaining pattern

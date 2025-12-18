@@ -51,28 +51,35 @@ CREATE TABLE books (
 ### API Design
 
 #### Core Endpoints
-```
-GET /books
-- Query params: status, year, genre, author, year_published
-- Returns: List of books with basic info
 
-GET /books/{book_id}
-- Returns: Detailed book information
+**Create:**
+- `POST /books/ingest` - Batch ingest books (accepts list of BookCreate objects)
 
-GET /reading-stats
-- Returns: Personal reading statistics (books read, pages, etc.)
+**Read:**
+- `GET /books` - List books with filtering (query params: status, genre, author, year_published)
+- `GET /books/{book_id}` - Get single book by database ID
+- `GET /reading-stats` - Aggregate reading statistics (totals, averages, genre breakdown)
+- `GET /reading-trends` - Time-based reading analysis (grouped by year, month, genre)
 
-GET /reading-trends
-- Query params: year, month
-- Returns: Reading patterns over time
-```
+**Update:**
+- `PUT /books/{book_id}` - Update book status by ID (query param: new_status)
+- `POST /books/batch-update` - Batch update from CSV data (for orchestration workflow)
+
+**Delete:**
+- `DELETE /books/{book_id}` - Delete single book by database ID
+- `POST /books/delta-delete` - Delta delete from CSV data (for orchestration workflow)
 
 #### Query Parameters
-- `status` - Filter by reading status (read/reading/want-to-read)
-- `year` - Filter by year read
-- `genre` - Filter by book genre
-- `author` - Filter by author name
+- `status` - Filter by reading status (read/currently-reading/to-read)
+- `genre` - Filter by book genre (case-insensitive)
+- `author` - Filter by author name (case-insensitive, partial match)
 - `year_published` - Filter by publication year
+
+#### Request/Response Schemas
+- All endpoints use Pydantic schemas for validation
+- Request bodies automatically validated before function execution
+- Response schemas ensure consistent output format
+- Automatic OpenAPI/Swagger documentation generation
 
 ### Data Validation & Schemas
 
@@ -147,10 +154,10 @@ GET /reading-trends
 1. **Data Ingestion & Sync**
    - User exports Goodreads library to CSV (manual upload cadence)
    - Pipeline parses CSV, filters out books already stored locally
+   - Update service syncs status changes from CSV exports
+   - Delete service removes books no longer in CSV
    - For new titles, Google Books API is queried for enriched metadata
    - Combined record (CSV + Google Books) is written to the database
-   - Update service syncs status changes from subsequent CSV exports
-   - Delete service removes books no longer in CSV (future)
 
 2. **API Layer**
    - FastAPI serves data from local database
@@ -196,8 +203,10 @@ GET /reading-trends
 - AWS deployment and operations
 
 ## Next Steps
-1. Initialize database schema (`Base.metadata.create_all`) and verify tables
-2. Implement deduplication service to filter existing books before enrichment
-3. Add FastAPI database dependency and ingestion endpoint
-4. Build orchestration script to run CSV → Google Books → DB pipeline locally
-5. Add tests and documentation for the ingestion workflow
+1. ~~Initialize database schema~~ ✅ Complete
+2. ~~Implement deduplication service~~ ✅ Complete
+3. ~~Add FastAPI database dependency and ingestion endpoint~~ ✅ Complete
+4. ~~Build orchestration script~~ ✅ Complete
+5. ~~Add CRUD API endpoints~~ ✅ Complete
+6. **Phase 3:** Cloud Migration (S3 + Airflow + AWS deployment)
+7. **Phase 4:** Frontend Dashboard
