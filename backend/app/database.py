@@ -9,7 +9,7 @@ from typing import Generator
 load_dotenv()
 
 # Default to SQLite for development if no env var is set
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./reading_dashboard.db")
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./books.db")
 
 # SQLite requires check_same_thread=False, other databases don't support it
 engine_kwargs = {}
