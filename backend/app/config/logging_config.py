@@ -43,7 +43,7 @@ def setup_logging():
     # Set log level FIRST
     root_logger.setLevel(log_level)
 
-    # Suppress verbose logging from third-party libraries
+    # Suppress verbose logging from third-party libraries (httpx returns a lot of DEBUG content)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
 
