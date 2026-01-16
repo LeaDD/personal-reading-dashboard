@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import String, cast, func
 
 from backend.app.database import get_db, engine
+from backend.app.dependencies import verify_api_key
 from backend.app.schemas.books_schema import BookCreate, BookResponse, StatsResponse, TrendsResponse, CSVBook
 from backend.app.services.ingest_books_to_db import ingest_books_to_db
 from backend.app.services.delete_books import delete_books
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/books",
     tags=["books"],
+    dependencies=[Depends(verify_api_key)],  # Require API key for all /books endpoints
 )
 
 def endpoint_exception_handler(e: Exception, exc_category: str, function_name: str):
