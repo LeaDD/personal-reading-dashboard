@@ -90,11 +90,11 @@ def orchestrate_csv_to_db(csv_file_path: str) -> None:
         
         logger.info(f"Orchestration complete. Total parsed: {len(books)}, New books: {len(new_books)}, Successfully ingested: {len(transformed_books)}, Failed: {len(failed_books)}")
 
-if __name__ == "__main__":
-    from backend.app.config.logging_config import setup_logging
-    
-    # Enable logging
-    setup_logging()
-    
-    orchestrate_csv_to_db("test_data/goodreads_library_export.csv")
 
+if __name__ == "__main__":
+    import sys
+    from backend.app.config.logging_config import setup_logging
+
+    setup_logging()
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else "test_data/goodreads_library_export.csv"
+    orchestrate_csv_to_db(csv_path)
