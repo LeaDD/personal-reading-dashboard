@@ -8,7 +8,8 @@ setup_logging()
 app = FastAPI(
     title="Personal Reading Dashboard API",
     description="API for personal reading analytics and insights",
-    version="0.1.0"
+    version="0.1.0",
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
 # # Add CORS middleware to allow requests from your Flask frontend
