@@ -9,7 +9,7 @@
                               │
                               ▼
                     ┌─────────────────┐
-                    │  init_db.py      │
+                    │  init_db         │
                     │  Create tables   │
                     └─────────────────┘
                               │
@@ -39,6 +39,17 @@
     └───────────────────────┘
             │
             │ Returns: list[CSVBook]
+            ▼
+    ┌───────────────────────┐
+    │  update_books()       │
+    │  delete_books()       │
+    │                       │
+    │  • Sync status        │
+    │    changes from CSV   │
+    │  • Remove books no    │
+    │    longer in CSV      │
+    └───────────────────────┘
+            │
             ▼
     ┌───────────────────────┐
     │  deduplication.py     │
@@ -77,14 +88,14 @@
     │                       │
     │  • Convert Pydantic    │
     │    → SQLAlchemy       │
-    │  • Handle duplicates   │
     │  • Commit to DB        │
     └───────────────────────┘
             │
             ▼
     ┌───────────────────────┐
     │  books.db             │
-    │  (SQLite)              │
+    │  (SQLite dev /        │
+    │   PostgreSQL prod)    │
     └───────────────────────┘
 
 
@@ -201,7 +212,7 @@
 ### Error Handling
 - **CSV parsing:** Invalid rows logged and skipped (ValidationError)
 - **Google Books API:** Failures return None, pipeline continues
-- **Database ingestion:** Duplicate `google_books_id` or `goodreads_id` skipped gracefully
+- **Database ingestion:** Unique constraint on `goodreads_id`; orchestration deduplicates before ingest so only new books are inserted
 - **Transformation:** ValidationError raised if data doesn't match schema
 
 ### Batch Processing

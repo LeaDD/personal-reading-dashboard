@@ -216,6 +216,7 @@ memory-bank/
 # My stuff
 docs/development-milestones.md
 docs/deployment-guide*
+docs/my-notes*
 
 test_google_books.py
 
